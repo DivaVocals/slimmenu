@@ -17,12 +17,14 @@
             indentChildren: false,
             childrenIndenter: '&nbsp;&nbsp;'
         };
+        
 
     function Plugin( element, options )
     {
         this.element = element;
         this.$elem = $(this.element);
         this.options = $.extend( {}, defaults, options );
+	this.oldwidth = 0;
         this.init();
     }
 
@@ -67,6 +69,7 @@
 
             this.resizeMenu({ data: { el: this.element, options: this.options } });
             $(window).on('resize', { el: this.element, options: this.options }, this.resizeMenu);
+	    $(window).trigger("resize");
         },
 
         resizeMenu: function(event)
@@ -75,6 +78,15 @@
                 $options = event.data.options,
                 $menu = $(event.data.el),
                 $menu_collapser = $('body').find('.menu-collapser');
+                
+			var windowWidth = $window.width();
+			if(window["innerWidth"] !== undefined){
+				if(window["innerWidth"] >  windowWidth){
+					windowWidth = window["innerWidth"];
+				}
+			}
+			if(windowWidth != this.oldwidth){
+				this.oldwidth = windowWidth;
 
             $menu.find('li').each(function()
             {
@@ -94,7 +106,7 @@
                 $(this).find('.sub-collapser').removeClass('expanded').children('i').html('&#9660;');
             });
 
-            if ($options.resizeWidth >= $window.width())
+	    if ($options.resizeWidth >= windowWidth)
             {
                 if ($options.indentChildren)
                 {
@@ -126,6 +138,7 @@
                 $menu.find('li > a > i').remove();
                 $menu.removeClass('collapsed').show();
                 $menu_collapser.hide();
+		}
             }
         },
 
